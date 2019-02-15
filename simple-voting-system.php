@@ -1,17 +1,17 @@
 <?php
 /**
  * Plugin Name: Sistema de votacion sencillo
- * Description: Plugin que provee de un shortcode para la votacion/clasificacion de entradas en WordPress
+ * Description: Plugin que provee de un shortcode para la votacion/clasificacion de entradas en WordPress. Vease https://octuweb.com/como-crear-sistemas-de-votacion-para-web/ para mas informacion
  * Author: Tomás El Fakih, Marcel Marín
- * Version: 0.1
+ * Version: 1.0
  */
 
 
 define( 'SVS_BASE_DIR', plugin_dir_path( __FILE__ ) );
-define( 'SVS_TEMPLATES_DIR', SVS_BASE_DIR . '/templates/' );
+define( 'SVS_TEMPLATES_DIR', SVS_BASE_DIR . 'templates/' );
 
 define( 'SVS_BASE_URL', plugin_dir_url( __FILE__ ) );
-define( 'SVS_ASSETS_URL', SVS_BASE_URL . '/assets/' );
+define( 'SVS_ASSETS_URL', SVS_BASE_URL . 'assets/' );
 
 define( 'SVS_MAX_SCORE', 5 );
 
@@ -20,9 +20,14 @@ define( 'SVS_MAX_SCORE', 5 );
  */
 add_action( 'wp_enqueue_scripts', 'svs_add_scripts', 99 );
 function svs_add_scripts() {
+	global $post;
+
 	wp_enqueue_style( 'rating-css', SVS_ASSETS_URL . 'css/stars.css' );
-	wp_enqueue_script( 'voting-logic', SVS_ASSETS_URL . 'js/voting.js' );
-	wp_localize_script( 'voting-logic', 'context', array( 'ajaxurl' => admin_url( 'admin-ajax.php' ) ) );
+	wp_enqueue_script( 'voting-logic', SVS_ASSETS_URL . 'js/voting.js', array( 'jquery' ) );
+
+	$context = array('ajaxurl' => admin_url( 'admin-ajax.php' ));
+	if ( $post ) $context['post_id'] = $post->ID;
+	wp_localize_script( 'voting-logic', 'context', $context );
 }
 
 /**
@@ -36,6 +41,8 @@ function svs_shortcode( $attrs = array() ) {
 /**
  * Manejador AJAX para el sistema de votacion
  */
+add_action( "wp_ajax_svs_vote", 'svs_ajax_handler', 10 );
+add_action( "wp_ajax_nopriv_svs_vote", 'svs_ajax_handler', 10 );
 function svs_ajax_handler() {
 	/* Tenemos que:
 		1) Obtener el ID del post y el puntaje obtenido
@@ -47,6 +54,7 @@ function svs_ajax_handler() {
 		Nota: Solamente escuchamos peticiones POST
 	*/
 	$retval = '';
+	error_log('Entre al handler');
 	if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
 		if ( ! empty( $_POST['post_id'] ) ) {
 			$post_id = $_POST['post_id'];
@@ -78,8 +86,8 @@ function svs_ajax_handler() {
 
 			// Llenamos un JSON con la data que nos interesa: Votos totales y puntaje promedio
 			$retval = json_encode( array(
-				'votos_totales' => $post_votes,
-				'puntaje_post' => $post_rating_avg
+				'votos' => $post_votes,
+				'puntaje' => $post_rating_raw
 			) );
 		}
 	}
