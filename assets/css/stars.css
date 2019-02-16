@@ -12,3 +12,22 @@
         .stars .voto span {display:block;width:20px;height:20px;background:url(iconos.png) no-repeat 0 -24px;float:right;cursor:pointer;}
             .stars .voto span a {line-height:100px;display:block}
         .stars .voto span:hover,.voto span:hover ~ span {background:url(iconos.png) no-repeat -20px -24px;}
+
+.mensaje {
+    position: fixed;
+    color: white;
+    padding: 0.3em;
+    border-radius: 4px;
+    bottom: 25px;
+    left: 25px;
+}
+
+.mensaje.ok {
+    background-color: green;
+    border: 1px solid darkgreen;
+}
+
+.mensaje.ko {
+    background-color: red;
+    border: 1px solid darkred;   
+}

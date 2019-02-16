@@ -23,7 +23,8 @@ function svs_add_scripts() {
 	global $post;
 
 	wp_enqueue_style( 'rating-css', SVS_ASSETS_URL . 'css/stars.css' );
-	wp_enqueue_script( 'voting-logic', SVS_ASSETS_URL . 'js/voting.js', array( 'jquery' ) );
+	wp_enqueue_script( 'cookie-handler', SVS_ASSETS_URL . 'js/cookie.handler.js' );
+	wp_enqueue_script( 'voting-logic', SVS_ASSETS_URL . 'js/voting.js', array( 'jquery', 'cookie-handler' ) );
 
 	$context = array('ajaxurl' => admin_url( 'admin-ajax.php' ));
 	if ( $post ) $context['post_id'] = $post->ID;
@@ -54,7 +55,6 @@ function svs_ajax_handler() {
 		Nota: Solamente escuchamos peticiones POST
 	*/
 	$retval = '';
-	error_log('Entre al handler');
 	if ( $_SERVER['REQUEST_METHOD'] === 'POST' ) {
 		if ( ! empty( $_POST['post_id'] ) ) {
 			$post_id = $_POST['post_id'];
@@ -89,6 +89,7 @@ function svs_ajax_handler() {
 				'votos' => $post_votes,
 				'puntaje' => $post_rating_raw
 			) );
+
 		}
 	}
 	echo $retval;
