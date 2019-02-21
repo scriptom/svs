@@ -24,9 +24,7 @@ jQuery(document).ready(function($) {
             })
             .done(function(msg) 
             {                 
-                var maximoposible=msg.votos*5;
-                var porcentaje=msg.puntaje*100/maximoposible;
-                    jQuery(".stars .stat").css("width",porcentaje+"%");
+                    jQuery(".stars .stat").css("width",msg.porcentaje+"%");
 
                 alerta("Gracias por tu voto :)","ok");
 

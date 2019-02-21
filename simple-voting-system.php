@@ -26,7 +26,7 @@ function svs_add_scripts() {
 	wp_enqueue_script( 'cookie-handler', SVS_ASSETS_URL . 'js/cookie.handler.js' );
 	wp_enqueue_script( 'voting-logic', SVS_ASSETS_URL . 'js/voting.js', array( 'jquery', 'cookie-handler' ) );
 
-	$context = array('ajaxurl' => admin_url( 'admin-ajax.php' ));
+	$context = array('ajaxurl' => admin_url( 'admin-ajax.php' ), 'max_score' => SVS_MAX_SCORE);
 	if ( $post ) $context['post_id'] = $post->ID;
 	wp_localize_script( 'voting-logic', 'context', $context );
 }
@@ -36,6 +36,8 @@ function svs_add_scripts() {
  */
 add_shortcode( 'simple_voting_system', 'svs_shortcode' );
 function svs_shortcode( $attrs = array() ) {
+	// Necesitamos obtener el porcentaje de votos iniciales
+	$puntaje = (int) get_post_meta( get_the_ID(), '_post_rating_avg', true );
 	include SVS_TEMPLATES_DIR . 'star-voting.php';
 }
 
@@ -87,7 +89,8 @@ function svs_ajax_handler() {
 			// Llenamos un JSON con la data que nos interesa: Votos totales y puntaje promedio
 			$retval = json_encode( array(
 				'votos' => $post_votes,
-				'puntaje' => $post_rating_raw
+				'puntaje' => $post_rating_raw,
+				'porcentaje' => $post_rating_avg
 			) );
 
 		}
@@ -99,3 +102,4 @@ function svs_ajax_handler() {
 
 
 
+add_filter( 'the_excerpt', 'do_shortcode', 11 );
