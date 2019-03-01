@@ -11,10 +11,11 @@ jQuery(document).ready(function($) {
 
     function votar(puntaje,objeto)
     {
-        if ( cookieHandler.getCookie("voto") === false ) {
+    	const cookie = `voto_post_${context.post_id}`;
+        if ( cookieHandler.getCookie(cookie) === false ) {
             
             // asignamos una cookie
-            cookieHandler.setCookie("voto", puntaje, 1, 'months');
+            cookieHandler.setCookie(cookie, puntaje, 1, 'months');
 
             jQuery.ajax({
                 method: "POST",
